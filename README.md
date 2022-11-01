@@ -18,7 +18,7 @@ This demo repo shows you how to deploy a fully functioning microservices applica
 ### Information to Gather
 #### Redis Enterprise in Google Cloud Marketplace
 * [REDISCLOUD_ACCESS_KEY](https://docs.redis.com/latest/rc/api/get-started/enable-the-api/)
-* [REDISCLOUD_SECRET_KEY](https://docs.redis.com/latest/rc/api/get-started/enable-the-api/)
+* [REDISCLOUD_SECRET_KEY](https://docs.redis.com/latest/rc/api/get-started/manage-api-keys/#secret)
 #### Google Cloud
 * Project ID
 * Region

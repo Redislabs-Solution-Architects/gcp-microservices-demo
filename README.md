@@ -167,7 +167,7 @@ export REDIS_IP="${REDIS_DEST},user=default,password=${REDIS_DEST_PASS}"
 ```  
 Update components/redis-enterprise/kustomization.yaml with the Redis Enterprise database's connection string:
 ```bash
-sed -i .bak "s/REDIS_CONNECTION_STRING/${REDIS_IP}/g" components/redis-enterprise/kustomization.yaml
+sed -i "s/REDIS_CONNECTION_STRING/${REDIS_IP}/g" components/redis-enterprise/kustomization.yaml
 ```
 
 Render to review the deployment manifest by running:

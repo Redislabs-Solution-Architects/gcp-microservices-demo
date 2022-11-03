@@ -2,7 +2,7 @@
   
 This demo repo shows you how to deploy a fully functioning microservices application on Google Cloud using Open Source Redis and migrate the data to Redis Enterprise with minimal downtime. 
 
-![Redis Enterprise for Online Boutique Mircoservices App](.docs/img/redis-enterprise.png)
+![Redis Enterprise for Online Boutique Mircoservices App](docs/img/redis-enterprise.png)
 
 ## Prerequisites 
 ### Software to Install

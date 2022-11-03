@@ -30,18 +30,18 @@ This demo repo shows you how to deploy a fully functioning microservices applica
 git clone https://github.com/Redislabs-Solution-Architects/gcp-microservices-demo.git
 pushd gcp-microservices-demo
 ```
-### Update the *terraform.tfvars.json*
+### Create your own terraform.tfvars
 The following values will need to be modified by you.
 ```bash
-"cluster_name": "The name of the GKE cluster",
-"gcp_project_id": "The project ID to deploy the cluster into",
-"gcp_region": "The region to deploy the cluster in",
-"gke_node_count": "The number of nodes to deploy in the cluster",
-"gke_release_channel": "The gke release channel to deploy",
-"gke_machine_type": "The type of machine to deploy",
-"redis_subscription_name": "The name of the Redis Enterprise Subscription",
-"redis_subscription_cidr": "The Redis Enterprise Subscription deployment's CIDR"
-```
+cat <<EOF >terraform.tfvars
+gcp_project_id = "my_project"
+domain_name = "demo.gcp-redis.com"
+email_address = "john.doe@ob.com"
+redis_access_key = "********"
+redis_secret_key = "********"
+cluster_name = "online-boutique"
+EOF
+```  
 ### Initialize Terraform
 ```bash
 terraform init
@@ -52,14 +52,15 @@ terraform apply --auto-approve
 ```
 ### What success looks like  
 ```bash
-Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
+Apply complete! Resources: 12 added, 0 changed, 0 destroyed.
 
 Outputs:
 
 db_password = <sensitive>
-db_private_endpoint = "redis-19574.internal.c21702.us-central1-1.gcp.cloud.rlrcp.com:19574"
-gke_cluster_name = "gke-online-boutique"
+db_private_endpoint = "redis-10402.internal.c22052.us-central1-1.gcp.cloud.rlrcp.com:10402"
+gke_cluster_name = "gke-glau-online-boutique"
 region = "us-central1"
+website = "https://demo2.gcp-redis.com"
 ```
 
 ### Store Redis Enterprise database information in environment variables for later use
@@ -77,48 +78,13 @@ $(terraform output -raw gke_cluster_name) \
   
    
 ## Run the demo
+Access the web frontend in a browser using the "doamin name" defined in your terraform.tfvars file. The web application is using the inbuilt  OSS Redis container as the backing store for the shopping cart.
+
 ### Clone the microserivces demo repo
 ```bash
 popd
 git clone https://github.com/gmflau/microservices-demo.git
 pushd microservices-demo/kustomize
-```
-  
-### Deploy the microserices demo app `Online Boutique` using the default OSS Redis as shopping cart 
-To see what the default Kustomize configuration defined by kustomize/kustomization.yaml will generate (without actually deploying them yet).
-```bash
-kubectl kustomize .
-```
-Apply the default Kustomize configuration (kustomize/kustomization.yaml) to use the OSS Redis as shopping cart.
-```bash
-kubectl apply -k .
-```
-Wait for all Pods to show `STATUS` of `Running`.
-```bash
-kubectl get pods
-```
-The output should be similar to the following:
-```
-NAME                                     READY   STATUS    RESTARTS   AGE
-adservice-67f7969f6d-8xh4p               1/1     Running   0          80s
-cartservice-866466c9d8-lrzcx             1/1     Running   0          79s
-checkoutservice-676b964c46-pl68q         1/1     Running   0          78s
-currencyservice-779fb5bb64-k8mbc         1/1     Running   0          77s
-emailservice-7d597f846b-hvv5m            1/1     Running   0          76s
-frontend-7684ff6c58-pcp5m                1/1     Running   0          75s
-loadgenerator-7f8d4c9b46-58lcn           1/1     Running   0          75s
-paymentservice-7d49db6cf6-ffvls          1/1     Running   0          74s
-productcatalogservice-7645c9696d-kshnd   1/1     Running   0          73s
-recommendationservice-5ff65b7856-6wxxd   1/1     Running   0          72s
-redis-cart-6f65887b5d-dc6wq              1/1     Running   0          71s
-shippingservice-5c674c976-tfvq9          1/1     Running   0          70s
-```
-  
-_Note: It may take 2-3 minutes before the changes are reflected on the deployment._
-
-Access the web frontend in a browser using the frontend's EXTERNAL_IP
-```
-kubectl get service frontend-external | awk '{print $4}'
 ```
   
 ### Migrate the shopping cart data from OSS Redis to Redis Enterpirse in Google Cloud Marketplace
@@ -188,8 +154,8 @@ kubectl apply -k .
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | The project ID to deploy the cluter into | `string` | n/a | yes |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | The domain name to use for DNS records | `string` | n/a | yes |
 | <a name="input_email_address"></a> [email\_address](#input\_email\_address) | The email address to use with Cert Manager | `string` | n/a | yes |
-| <a name="input_redis_secret_key"></a> [redis\_secret\_key](#input\_redis\_secret\_key) | The type of Redis DB to be deployed Options are 'OSS' or 'Ent' | `string` | n/a | yes |
-| <a name="input_redis_access_key"></a> [redis\_access\_key](#input\_redis\_access\_key) | The type of Redis DB to be deployed Options are 'OSS' or 'Ent' | `string` | n/a | yes |
+| <a name="input_redis_secret_key"></a> [redis\_secret\_key](#input\_redis\_secret\_key) | The secret key for accessing Redis Enterprise Cloud API | `string` | n/a | yes |
+| <a name="input_redis_access_key"></a> [redis\_access\_key](#input\_redis\_access\_key) | The access key for accessing Redis Enterprise Cloud API | `string` | n/a | yes |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | The name of the GKE cluster | `string` | `"boutique"` | no |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | The region to deploy the cluster in | `string` | `"us-central1"` | no |
 | <a name="input_gke_node_count"></a> [gke\_node\_count](#input\_gke\_node\_count) | The number of nodes to deploy in the cluster | `number` | `1` | no |

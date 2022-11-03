@@ -6,7 +6,7 @@ resource "google_compute_network" "gcp_network" {
 }
 
 resource "google_compute_subnetwork" "k8s" {
-  name          = "k8s"
+  name          = format("%s-k8s", var.cluster_name)
   project       = var.gcp_project_id
   region        = var.gcp_region
   network       = google_compute_network.gcp_network.id

@@ -14,12 +14,12 @@ variable "email_address" {
 }
 
 variable "redis_secret_key" {
-  description = "The type of Redis DB to be deployed Options are 'OSS' or 'Ent'"
+  description = "The secret key for accessing Redis Enterprise Cloud API"
   type        = string
 }
 
 variable "redis_access_key" {
-  description = "The type of Redis DB to be deployed Options are 'OSS' or 'Ent'"
+  description = "The access key for accessing Redis Enterprise Cloud API"
   type        = string
 }
 

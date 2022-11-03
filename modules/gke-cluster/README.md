@@ -12,12 +12,10 @@
 | <a name="input_gcp_network_name"></a> [gcp\_network\_name](#input\_gcp\_network\_name) | The name of the GCP Network | `string` | n/a | yes |
 | <a name="input_gcp_subnet_name"></a> [gcp\_subnet\_name](#input\_gcp\_subnet\_name) | The name of the GCP Network | `string` | n/a | yes |
 
-   
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_gke_cluster_name"></a> [gke\_cluster\_name](#output\_gke\_cluster\_name) | GKE Cluster Name |
-| <a name="output_region"></a> [region](#output\_region) | GCP Region |
-
+| <a name="output_gke_cluster_name"></a> [gke\_cluster\_name](#output\_gke\_cluster\_name) | The name of the GKE cluster |
+| <a name="output_region"></a> [region](#output\_region) | The Region the GKE cluster is deployed |
 <!-- END_TF_DOCS -->

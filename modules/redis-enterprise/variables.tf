@@ -8,18 +8,17 @@ variable "redis_subscription_cidr" {
   type        = string
 }
 
-variable "gcp_project_id" {
-  description = "The project ID to deploy the cluter into"
-  type        = string
-}
-
 variable "gcp_region" {
   description = "The region to deploy the cluster in"
   type        = string
 }
 
-variable "gcp_network_name" {
-  description = "The name of the GCP Network"
+variable "redis_secret_key" {
+  description = "The type of Redis DB to be deployed Options are 'OSS' or 'Ent'"
   type        = string
 }
 
+variable "redis_access_key" {
+  description = "The type of Redis DB to be deployed Options are 'OSS' or 'Ent'"
+  type        = string
+}

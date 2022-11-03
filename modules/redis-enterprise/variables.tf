@@ -23,3 +23,12 @@ variable "gcp_network_name" {
   type        = string
 }
 
+variable "redis_secret_key" {
+  description = "The type of Redis DB to be deployed Options are 'OSS' or 'Ent'"
+  type        = string
+}
+
+variable "redis_access_key" {
+  description = "The type of Redis DB to be deployed Options are 'OSS' or 'Ent'"
+  type        = string
+}

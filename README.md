@@ -2,7 +2,7 @@
   
 This demo repo shows you how to deploy a fully functioning microservices application on Google Cloud using Open Source Redis and migrate the data to Redis Enterprise with minimal downtime. 
 
-![Redis Enterprise for Online Boutique Mircoservices App](./img/redis-enterprise.png)
+![Redis Enterprise for Online Boutique Mircoservices App](.docs/img/redis-enterprise.png)
 
 ## Prerequisites 
 ### Software to Install
@@ -138,7 +138,7 @@ EOF
 ```   
 Run a K8 job to migrate data from OSS Redis to Redis Enterprise database
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/Redislabs-Solution-Architects/gcp-microservices-demo/main/redis-migrator-job.yaml
+kubectl apply -f https://raw.githubusercontent.com/Redislabs-Solution-Architects/gcp-microservices-demo/main/util/redis-migrator-job.yaml
 ```
 
 ### Delete local redis-cart based on OSS Redis
@@ -180,4 +180,32 @@ Deploy to make the Redis Enterprise database as the backend store for the shoppi
 kubectl apply -k .
 ```
 
- 
+<!-- BEGIN_TF_DOCS -->
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | The project ID to deploy the cluter into | `string` | n/a | yes |
+| <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | The domain name to use for DNS records | `string` | n/a | yes |
+| <a name="input_email_address"></a> [email\_address](#input\_email\_address) | The email address to use with Cert Manager | `string` | n/a | yes |
+| <a name="input_redis_secret_key"></a> [redis\_secret\_key](#input\_redis\_secret\_key) | The type of Redis DB to be deployed Options are 'OSS' or 'Ent' | `string` | n/a | yes |
+| <a name="input_redis_access_key"></a> [redis\_access\_key](#input\_redis\_access\_key) | The type of Redis DB to be deployed Options are 'OSS' or 'Ent' | `string` | n/a | yes |
+| <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | The name of the GKE cluster | `string` | `"boutique"` | no |
+| <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | The region to deploy the cluster in | `string` | `"us-central1"` | no |
+| <a name="input_gke_node_count"></a> [gke\_node\_count](#input\_gke\_node\_count) | The number of nodes to deploy in the cluster | `number` | `1` | no |
+| <a name="input_gke_release_channel"></a> [gke\_release\_channel](#input\_gke\_release\_channel) | The gke release channel to deploy | `string` | `"RAPID"` | no |
+| <a name="input_gke_machine_type"></a> [gke\_machine\_type](#input\_gke\_machine\_type) | The type of machine to deploy | `string` | `"c2-standard-4"` | no |
+| <a name="input_redis_subscription_cidr"></a> [redis\_subscription\_cidr](#input\_redis\_subscription\_cidr) | The name of the Redis Enterprise Cloud Subscription deployment's CIDR | `string` | `"192.168.0.0/24"` | no |
+| <a name="input_cert_manager_version"></a> [cert\_manager\_version](#input\_cert\_manager\_version) | The version of cert manager to install | `string` | `"v1.10.0"` | no |
+| <a name="input_redis_db_type"></a> [redis\_db\_type](#input\_redis\_db\_type) | The type of Redis DB to be setup by default. Valid options are 'OSS' or 'Ent' | `string` | `"OSS"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_gke_cluster_name"></a> [gke\_cluster\_name](#output\_gke\_cluster\_name) | The name of the GKE cluster |
+| <a name="output_region"></a> [region](#output\_region) | The Region the GKE cluster is deployed |
+| <a name="output_db_private_endpoint"></a> [db\_private\_endpoint](#output\_db\_private\_endpoint) | The Redis DB endpoint |
+| <a name="output_db_password"></a> [db\_password](#output\_db\_password) | The Redis DB Password |
+| <a name="output_website"></a> [website](#output\_website) | The domain the website will be hosted on. |
+<!-- END_TF_DOCS -->

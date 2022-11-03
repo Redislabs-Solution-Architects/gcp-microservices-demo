@@ -48,7 +48,7 @@ resource "null_resource" "install_external_dns" {
     command = <<-EOT
         helm repo add bitnami https://charts.bitnami.com/bitnami && \
         helm repo update && \
-        helm install external-dns bitnami/external-dns --create-namespace -n external-dns --set policy=sync --set provider=google --set triggerLoopOnEvent=true --set google.project=${var.gcp_project_id}
+        helm install external-dns bitnami/external-dns --create-namespace -n external-dns --set provider=google --set triggerLoopOnEvent=true --set google.project=${var.gcp_project_id}
     EOT
   }
 }

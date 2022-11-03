@@ -1,3 +1,8 @@
+[![Redis](https://img.shields.io/badge/Redis-redis.com-red.svg?style=flat-square)](https://redis.com)
+[![Google Cloud](https://img.shields.io/badge/Google%20Cloud-cloud.google.com-blue.svg?style=flat-square)](https://cloud.google.com)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg?style=flat-square)](https://github.com/Redislabs-Solution-Architects/gcp-microservices-demo/pulls)
+![Stability Experimental](https://img.shields.io/badge/Stability-Experimental-red.svg)
+
 # Scaling Microservices Applications: Migration to Redis Enterprise on Google Cloud
   
 This demo repo shows you how to deploy a fully functioning microservices application on Google Cloud using Open Source Redis and migrate the data to Redis Enterprise with minimal downtime. 
@@ -15,6 +20,11 @@ This demo repo shows you how to deploy a fully functioning microservices applica
 ### Accounts Needed
 * [Google Cloud Account](https://console.cloud.google.com/)
 * [Redis Enterprise in Google Marketplace Account](https://console.cloud.google.com/marketplace/product/redis-marketplace-isaas/redis-enterprise-cloud-flexible-plan)
+* Some DNS Domain
+  * Use [Google Domains](https://cloud.google.com/domains/docs/overview) if you don't have one
+  * A subdomain would also be fine: `foo.bar.com`
+### Actions taken prior to demo
+* Configure your domain with [Cloud DNS](https://cloud.google.com/dns/docs/overview)
 ### Information to Gather
 #### Redis Enterprise in Google Cloud Marketplace
 * [REDISCLOUD_ACCESS_KEY](https://docs.redis.com/latest/rc/api/get-started/enable-the-api/)
@@ -39,7 +49,6 @@ domain_name = "demo.gcp-redis.com"
 email_address = "john.doe@ob.com"
 redis_access_key = "********"
 redis_secret_key = "********"
-cluster_name = "online-boutique"
 EOF
 ```  
 ### Initialize Terraform
@@ -67,6 +76,7 @@ website = "https://demo2.gcp-redis.com"
 ```bash
 export REDIS_DEST=`terraform output db_private_endpoint | tr -d '"'`
 export REDIS_DEST_PASS=`terraform output db_password | tr -d '"'`
+export REDIS_ENDPOINT="${REDIS_DEST},user=default,password=${REDIS_DEST_PASS}"
 ```
        
 ### Target your environment to the GKE cluster
@@ -75,20 +85,12 @@ gcloud container clusters get-credentials \
 $(terraform output -raw gke_cluster_name) \
 --region $(terraform output -raw region)
 ```
-  
-   
-## Run the demo
-Access the web frontend in a browser using the "doamin name" defined in your terraform.tfvars file. The web application is using the inbuilt  OSS Redis container as the backing store for the shopping cart.
 
-### Clone the microserivces demo repo
-```bash
-popd
-git clone https://github.com/gmflau/microservices-demo.git
-pushd microservices-demo/kustomize
-```
-  
+## Run the demo
+Access the web frontend in a browser using the "website" outputed after your terraform apply. The web application is using the inbuilt OSS Redis container as the backing store for the shopping cart. Make sure you add some items to your cart in order to see that data migration works as well.
+
 ### Migrate the shopping cart data from OSS Redis to Redis Enterpirse in Google Cloud Marketplace
-Create a K8 secret for Redis Enterprise database connection
+Create a K8s secret for Redis Enterprise database connection
 ```bash
 kubectl apply -f - <<EOF
 apiVersion: v1
@@ -102,50 +104,37 @@ stringData:
   REDIS_DEST_PASS: ${REDIS_DEST_PASS}
 EOF
 ```   
-Run a K8 job to migrate data from OSS Redis to Redis Enterprise database
+Run a K8s job to migrate data from OSS Redis to Redis Enterprise database (Should take about 15 seconds)
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/Redislabs-Solution-Architects/gcp-microservices-demo/main/util/redis-migrator-job.yaml
 ```
 
+### Patch the "Cart" deployment to point to the new Redis Database
+Run a K8s patch command to update the `cartservice` deployment to point to the new Redis Enterprise Endpoint (Should take about 30 seconds)
+```bash
+kubectl patch deployment cartservice --patch '{"spec":{"template":{"spec":{"containers":[{"name":"server","env":[{"name":"REDIS_ADDR","value":"'$REDIS_ENDPOINT'"}]}]}}}}'
+```
+
+### Validate everything is working...
+Visit your website and make sure everything is still in your cart
+
+#### Command to roll back if needed:
+If you need to roll back for any reason, this patch command will point back to OSS
+```bash
+kubectl patch deployment cartservice --patch '{"spec":{"template":{"spec":{"containers":[{"name":"server","env":[{"name":"REDIS_ADDR","value":"redis-cart:6379"}]}]}}}}'
+```
+
 ### Delete local redis-cart based on OSS Redis
+Now that everything is working and your items are still in your cart, you delete the OSS Redis deployment
 ```bash
 kubectl delete deploy redis-cart
 ```
- 
-### Configure the shopping cart with Redis Enterprise database via Kustomize
-```bash
-kustomize edit add component components/redis-enterprise
-```
-  
-This will update the kustomize/kustomization.yaml file which could be similar to:
-```
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-- base
-components:
-- components/redis-enterprise
-```
 
-Update current Kustomize manifest to target this fully managed Redis Enterprise database instance Construct the connection string for the fully managed Redis Enterprise database instance:
-```bash
-export REDIS_IP="${REDIS_DEST},user=default,password=${REDIS_DEST_PASS}"
-```  
-Update components/redis-enterprise/kustomization.yaml with the Redis Enterprise database's connection string:
-```bash
-sed -i "s/REDIS_CONNECTION_STRING/${REDIS_IP}/g" components/redis-enterprise/kustomization.yaml
-```
+## Done!
+Congrats! You've completed the demo.
 
-Render to review the deployment manifest by running:
-```bash
-kubectl kustomize .
-```
-  
-Deploy to make the Redis Enterprise database as the backend store for the shopping cart:
-```bash
-kubectl apply -k .
-```
 
+# Terraform Module Documentation
 <!-- BEGIN_TF_DOCS -->
 ## Inputs
 

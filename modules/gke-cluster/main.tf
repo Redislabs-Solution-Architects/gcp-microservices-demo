@@ -16,8 +16,8 @@ resource "google_container_cluster" "primary" {
     ]
   }
   ip_allocation_policy {
-    cluster_secondary_range_name  = "k8s-pod-range"
-    services_secondary_range_name = "k8s-service-range"
+    cluster_secondary_range_name  = format("%s-pod-range", var.cluster_name)
+    services_secondary_range_name = format("%s-service-range", var.cluster_name)
   }
   lifecycle {
     ignore_changes = all
